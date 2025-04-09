@@ -78,5 +78,45 @@
       "content": "#include <iostream>\nusing namespace std;\n\nclass IAudioPlayer {\npublic:\n    virtual void playAudio() const = 0;\n    virtual ~IAudioPlayer() {}\n};\n\nclass IVideoPlayer {\npublic:\n    virtual void playVideo() const = 0;\n    virtual ~IVideoPlayer() {}\n};\n\nclass MediaDevice : public IAudioPlayer, public IVideoPlayer {\npublic:\n    void playAudio() const override {\n        cout << \"Playing audio...\" << endl;\n    }\n    void playVideo() const override {\n        cout << \"Playing video...\" << endl;\n    }\n};\n\nint main() {\n    MediaDevice device;\n    IAudioPlayer* audio = &device;\n    IVideoPlayer* video = &device;\n    audio->playAudio();\n    video->playVideo();\n    return 0;\n}"
     },
     "explanation": "This shows ***interface segregation***:\n- ***IAudioPlayer*** and ***IVideoPlayer*** are distinct interfaces with ```playAudio``` and ```playVideo```.\n- Virtual destructors ensure proper cleanup.\n- ***MediaDevice*** implements both, providing specific functionality for each.\n- In ```main```, pointers to individual interfaces (***IAudioPlayer*** and ***IVideoPlayer***) access only relevant methods.\n- This ensures classes aren’t forced to implement unrelated functions."
+  },
+  {
+    "title": "Library Book Encapsulation",
+    "ques": "Create a C++ program that uses encapsulation with access modifiers to manage library books. Implement a Book class with private members for title and availability, and public methods to borrow and return the book.",
+    "answer": {
+      "type": "code",
+      "lang": "cpp",
+      "content": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Book {\nprivate:\n    string title;\n    bool isAvailable;\n\npublic:\n    Book(string bookTitle) {\n        title = bookTitle;\n        isAvailable = true;\n    }\n\n    bool borrowBook() {\n        if (isAvailable) {\n            isAvailable = false;\n            cout << title << \" borrowed successfully.\" << endl;\n            return true;\n        }\n        cout << title << \" is not available.\" << endl;\n        return false;\n    }\n\n    void returnBook() {\n        if (!isAvailable) {\n            isAvailable = true;\n            cout << title << \" returned successfully.\" << endl;\n        }\n    }\n\n    bool checkAvailability() const {\n        return isAvailable;\n    }\n};\n\nint main() {\n    Book book(\"The C++ Guide\");\n    book.borrowBook();\n    book.borrowBook();\n    book.returnBook();\n    cout << \"Available: \" << (book.checkAvailability() ? \"Yes\" : \"No\") << endl;\n    return 0;\n}"
+    },
+    "explanation": "This program demonstrates ***encapsulation***:\n- ***title*** and ***isAvailable*** are ```private```, restricting direct access.\n- The constructor sets the ***title*** and initializes ***isAvailable*** to true.\n- ```borrowBook``` changes ***isAvailable*** to false if available, returning a success flag.\n- ```returnBook``` sets ***isAvailable*** back to true if it was borrowed.\n- ```checkAvailability``` provides read-only access to the status.\n- In ```main```, we test borrowing and returning, interacting only through public methods."
+  },
+  {
+    "title": "Appliance Abstraction",
+    "ques": "Write a C++ program illustrating abstraction with classes and interfaces. Define an abstract Appliance class with a pure virtual function for power consumption, and implement it in Fan and Heater derived classes.",
+    "answer": {
+      "type": "code",
+      "lang": "cpp",
+      "content": "#include <iostream>\nusing namespace std;\n\nclass Appliance {\npublic:\n    virtual double calculatePower() const = 0; // Pure virtual function\n    virtual ~Appliance() {}\n};\n\nclass Fan : public Appliance {\nprivate:\n    double wattage;\npublic:\n    Fan(double w) : wattage(w) {}\n    double calculatePower() const override {\n        return wattage;\n    }\n};\n\nclass Heater : public Appliance {\nprivate:\n    double wattage;\npublic:\n    Heater(double w) : wattage(w) {}\n    double calculatePower() const override {\n        return wattage * 1.5; // Heaters consume more\n    }\n};\n\nint main() {\n    Appliance* appliances[] = {new Fan(50.0), new Heater(1000.0)};\n    for (int i = 0; i < 2; i++) {\n        cout << \"Power Consumption: \" << appliances[i]->calculatePower() << \" watts\" << endl;\n        delete appliances[i];\n    }\n    return 0;\n}"
+    },
+    "explanation": "This showcases ***abstraction***:\n- ***Appliance*** is an abstract class with ```calculatePower() = 0``` as the interface.\n- ```virtual ~Appliance()``` ensures proper cleanup.\n- ***Fan*** returns its ***wattage*** directly, while ***Heater*** multiplies by 1.5 for higher consumption.\n- ```override``` confirms correct implementation.\n- In ```main```, an ***Appliance*** pointer array uses polymorphism to compute and display power usage."
+  },
+  {
+    "title": "Data Hiding with Wallet",
+    "ques": "Implement a C++ program to demonstrate data hiding. Create a Wallet class with private members for cash and card count, and public methods to add cash and cards while keeping data secure.",
+    "answer": {
+      "type": "code",
+      "lang": "cpp",
+      "content": "#include <iostream>\nusing namespace std;\n\nclass Wallet {\nprivate:\n    double cash;\n    int cardCount;\n\npublic:\n    Wallet(double initialCash, int cards) {\n        cash = (initialCash >= 0) ? initialCash : 0;\n        cardCount = (cards >= 0) ? cards : 0;\n    }\n\n    void addCash(double amount) {\n        if (amount >= 0) {\n            cash += amount;\n            cout << \"Added \" << amount << \" to wallet.\" << endl;\n        }\n    }\n\n    void addCard() {\n        cardCount++;\n        cout << \"Card added.\" << endl;\n    }\n\n    double getCash() const {\n        return cash;\n    }\n\n    int getCardCount() const {\n        return cardCount;\n    }\n};\n\nint main() {\n    Wallet wallet(20.0, 2);\n    wallet.addCash(15.5);\n    wallet.addCard();\n    cout << \"Cash: \" << wallet.getCash() << \", Cards: \" << wallet.getCardCount() << endl;\n    return 0;\n}"
+    },
+    "explanation": "This illustrates ***data hiding***:\n- ***cash*** and ***cardCount*** are ```private```, preventing direct modification.\n- The constructor ensures non-negative initial values.\n- ```addCash``` increases ***cash*** if the amount is valid.\n- ```addCard``` increments ***cardCount*** safely.\n- ```getCash``` and ```getCardCount``` offer read-only access.\n- In ```main```, we modify and retrieve values through public methods, keeping data hidden."
+  },
+  {
+    "title": "Interface Segregation with Smart Home",
+    "ques": "Demonstrate interface segregation in C++ by creating separate interfaces for LightControl and TemperatureControl, then implement a SmartHomeDevice class that uses both functionalities.",
+    "answer": {
+      "type": "code",
+      "lang": "cpp",
+      "content": "#include <iostream>\nusing namespace std;\n\nclass ILightControl {\npublic:\n    virtual void toggleLight() const = 0;\n    virtual ~ILightControl() {}\n};\n\nclass ITemperatureControl {\npublic:\n    virtual void adjustTemperature() const = 0;\n    virtual ~ITemperatureControl() {}\n};\n\nclass SmartHomeDevice : public ILightControl, public ITemperatureControl {\npublic:\n    void toggleLight() const override {\n        cout << \"Light toggled.\" << endl;\n    }\n    void adjustTemperature() const override {\n        cout << \"Temperature adjusted.\" << endl;\n    }\n};\n\nint main() {\n    SmartHomeDevice device;\n    ILightControl* light = &device;\n    ITemperatureControl* temp = &device;\n    light->toggleLight();\n    temp->adjustTemperature();\n    return 0;\n}"
+    },
+    "explanation": "This demonstrates ***interface segregation***:\n- ***ILightControl*** and ***ITemperatureControl*** are separate interfaces with ```toggleLight``` and ```adjustTemperature```.\n- Virtual destructors ensure proper cleanup.\n- ***SmartHomeDevice*** implements both interfaces with specific actions.\n- In ```main```, pointers to individual interfaces access only relevant methods.\n- This prevents forcing unrelated functionality on clients, adhering to the principle."
   }
 ]
